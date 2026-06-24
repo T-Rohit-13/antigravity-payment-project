@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>RetireQuest — Gamified Retirement Savings for Gen Z India</title>
+    <meta name="description" content="RetireQuest is a mobile-first gamified retirement savings app for Gen Z in India. Save via UPI, earn XP, unlock badges, and build your retirement corpus.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="app" class="app-container">
+
+        <!-- ==================== SCREEN 1: ONBOARDING ==================== -->
+        <section id="screen-onboarding" class="screen active">
+            <div class="onboarding-wrapper">
+                <div class="onboarding-header">
+                    <div class="logo-mark">
+                        <span class="logo-icon">🏔️</span>
+                        <h1 class="logo-text">Retire<span class="accent">Quest</span></h1>
+                    </div>
+                    <p class="tagline">Your retirement journey starts here.</p>
+                </div>
+
+                <div class="onboarding-card glass-card">
+                    <label class="input-label">How old are you?</label>
+                    <div class="slider-group">
+                        <input type="range" id="age-slider" min="18" max="35" value="22" class="custom-slider slider-teal">
+                        <div class="slider-value" id="age-value">22 years</div>
+                    </div>
+                </div>
+
+                <div class="onboarding-card glass-card">
+                    <label class="input-label">Pick your goal type</label>
+                    <div class="goal-cards">
+                        <button class="goal-card active" id="goal-age-card" onclick="selectGoalType('age')">
+                            <span class="goal-icon">🎯</span>
+                            <span class="goal-title">Retirement Age</span>
+                            <span class="goal-desc">Pick when you want to retire</span>
+                        </button>
+                        <button class="goal-card" id="goal-amount-card" onclick="selectGoalType('amount')">
+                            <span class="goal-icon">💰</span>
+                            <span class="goal-title">Target Amount</span>
+                            <span class="goal-desc">Pick your corpus goal</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Retirement Age Slider -->
+                <div class="onboarding-card glass-card" id="goal-age-section">
+                    <label class="input-label">At what age do you want to retire?</label>
+                    <div class="slider-group">
+                        <input type="range" id="retire-age-slider" min="40" max="70" value="50" class="custom-slider slider-purple">
+                        <div class="slider-value" id="retire-age-value">50 years</div>
+                    </div>
+                </div>
+
+                <!-- Target Amount Slider -->
+                <div class="onboarding-card glass-card hidden" id="goal-amount-section">
+                    <label class="input-label">What's your target corpus?</label>
+                    <div class="slider-group">
+                        <input type="range" id="target-amount-slider" min="100000" max="10000000" step="50000" value="3000000" class="custom-slider slider-amber">
+                        <div class="slider-value" id="target-amount-value">₹30,00,000</div>
+                    </div>
+                </div>
+
+                <div class="onboarding-card glass-card calculator-card">
+                    <div class="calc-header">
+                        <span class="calc-icon">📊</span>
+                        <span class="calc-title">Live Projection</span>
+                    </div>
+                    <div class="calc-grid">
+                        <div class="calc-stat">
+                            <span class="calc-label">Monthly SIP needed</span>
+                            <span class="calc-value" id="calc-sip">₹2,500</span>
+                        </div>
+                        <div class="calc-stat">
+                            <span class="calc-label">Years remaining</span>
+                            <span class="calc-value" id="calc-years">28 yrs</span>
+                        </div>
+                        <div class="calc-stat highlight">
+                            <span class="calc-label">Projected corpus</span>
+                            <span class="calc-value" id="calc-corpus">₹45.2L</span>
+                        </div>
+                        <div class="calc-stat">
+                            <span class="calc-label">Annual return</span>
+                            <span class="calc-value">8% p.a.</span>
+                        </div>
+                    </div>
+                    <div class="progress-journey">
+                        <div class="journey-labels">
+                            <span>Start</span>
+                            <span id="journey-end-label">₹45.2L Goal</span>
+                        </div>
+                        <div class="journey-bar">
+                            <div class="journey-fill" id="journey-fill" style="width: 2%"></div>
+                            <div class="journey-marker" id="journey-marker" style="left: 2%">
+                                <span class="marker-dot"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="btn-primary cta-btn" id="lock-goal-btn" onclick="lockGoal()">
+                    <span class="btn-icon">🔒</span>
+                    Lock my goal & start saving
+                </button>
+            </div>
+        </section>
+
+        <!-- ==================== SCREEN 2: DASHBOARD ==================== -->
+        <section id="screen-home" class="screen">
+            <div class="dashboard-wrapper">
+                <!-- Player Header -->
+                <div class="player-header">
+                    <div class="avatar-section">
+                        <div class="avatar-ring" id="avatar-ring">
+                            <div class="avatar" id="player-avatar">🧑‍🚀</div>
+                        </div>
+                        <div class="player-info">
+                            <h2 class="player-name" id="player-name">Adventurer</h2>
+                            <span class="player-level" id="player-level">Level 1 Saver</span>
+                        </div>
+                    </div>
+                    <div class="theme-toggle" onclick="toggleTheme()" title="Toggle dark/light mode">
+                        <span id="theme-icon">🌙</span>
+                    </div>
+                </div>
+
+                <!-- XP Bar -->
+                <div class="xp-bar-container glass-card">
+                    <div class="xp-info">
+                        <span class="xp-label">XP</span>
+                        <span class="xp-numbers" id="xp-numbers">120 / 500</span>
+                    </div>
+                    <div class="xp-bar">
+                        <div class="xp-fill" id="xp-fill" style="width: 24%"></div>
+                    </div>
+                    <span class="xp-next" id="xp-next">380 XP to Level 2</span>
+                </div>
+
+                <!-- Streak Card -->
+                <div class="streak-card glass-card">
+                    <div class="streak-left">
+                        <span class="streak-fire" id="streak-fire">🔥</span>
+                        <div class="streak-info">
+                            <span class="streak-count" id="streak-count">0-day streak</span>
+                            <span class="streak-sub">Save today to start your streak!</span>
+                        </div>
+                    </div>
+                    <div class="streak-badge" id="streak-badge">
+                        <span class="multiplier">×1</span>
+                        <span class="multiplier-label">XP</span>
+                    </div>
+                </div>
+
+                <!-- Stat Cards -->
+                <div class="stat-cards">
+                    <div class="stat-card glass-card">
+                        <span class="stat-icon">💰</span>
+                        <span class="stat-value" id="stat-saved">₹0</span>
+                        <span class="stat-label">Total Saved</span>
+                    </div>
+                    <div class="stat-card glass-card">
+                        <span class="stat-icon">🪙</span>
+                        <span class="stat-value" id="stat-coins">0</span>
+                        <span class="stat-label">Coins</span>
+                    </div>
+                    <div class="stat-card glass-card">
+                        <span class="stat-icon">🏔️</span>
+                        <span class="stat-value" id="stat-corpus">₹0</span>
+                        <span class="stat-label">Projected</span>
+                    </div>
+                </div>
+
+                <!-- Vault Progress -->
+                <div class="vault-progress glass-card">
+                    <div class="vault-header">
+                        <span class="vault-title">Vault Progress</span>
+                        <span class="vault-amount" id="vault-current-label">₹0 / ₹30L</span>
+                    </div>
+                    <div class="vault-bar">
+                        <div class="vault-fill" id="vault-fill" style="width: 0%"></div>
+                    </div>
+                </div>
+
+                <!-- Today's Action -->
+                <div class="action-card glass-card">
+                    <div class="action-header">
+                        <span class="action-icon">⚡</span>
+                        <span class="action-title">Today's Action</span>
+                    </div>
+                    <p class="action-desc" id="action-desc">Save <strong>₹100</strong> to keep your streak alive</p>
+                    <div class="action-buttons">
+                        <button class="btn-primary" onclick="showSaveModal()">
+                            <span class="btn-icon">📱</span>
+                            Pay via UPI
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Round-Up Card -->
+                <div class="roundup-card glass-card">
+                    <div class="roundup-header">
+                        <span class="roundup-icon">✨</span>
+                        <span class="roundup-title">Magic Round-Up</span>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="roundup-toggle" onchange="toggleRoundUp()">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    <div class="roundup-body" id="roundup-body">
+                        <p class="roundup-desc">Auto-save spare change from every UPI payment</p>
+                        <div class="roundup-options">
+                            <button class="roundup-opt active" onclick="setRoundUp(10, this)">₹10</button>
+                            <button class="roundup-opt" onclick="setRoundUp(50, this)">₹50</button>
+                            <button class="roundup-opt" onclick="setRoundUp(100, this)">₹100</button>
+                        </div>
+                        <div class="roundup-feed" id="roundup-feed">
+                            <div class="roundup-item">Paid ₹147 → <strong>₹3 saved</strong> to vault</div>
+                            <div class="roundup-item">Paid ₹82 → <strong>₹18 saved</strong> to vault</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== SCREEN 3: VAULT ==================== -->
+        <section id="screen-vault" class="screen">
+            <div class="vault-wrapper">
+                <div class="vault-status-banner glass-card" id="vault-status-banner">
+                    <span class="vault-status-icon" id="vault-status-icon">🔒</span>
+                    <span class="vault-status-text" id="vault-status-text">Vault Locked — Keep saving to reach your goal!</span>
+                </div>
+
+                <div class="vault-balance-card glass-card">
+                    <span class="vault-balance-label">Vault Balance</span>
+                    <span class="vault-balance-value" id="vault-balance-value">₹0</span>
+                    <div class="vault-fund-info">
+                        <span class="fund-badge">Liquid Mutual Fund</span>
+                        <span class="fund-return">~8% p.a.</span>
+                    </div>
+                </div>
+
+                <div class="vault-actions">
+                    <button class="btn-primary" onclick="showSaveModal()">
+                        <span class="btn-icon">➕</span>
+                        Add to Vault
+                    </button>
+                    <button class="btn-secondary" onclick="showVaultRules()">
+                        <span class="btn-icon">📜</span>
+                        View Vault Rules
+                    </button>
+                </div>
+
+                <!-- Withdrawal Tabs -->
+                <div class="withdrawal-section glass-card">
+                    <div class="withdrawal-tabs">
+                        <button class="wtab active" onclick="switchWithdrawTab('goal', this)">✅ Goal Complete</button>
+                        <button class="wtab" onclick="switchWithdrawTab('emergency', this)">🆘 Emergency</button>
+                        <button class="wtab" onclick="switchWithdrawTab('early', this)">⚠️ Early</button>
+                    </div>
+
+                    <!-- Goal Complete Tab -->
+                    <div class="wtab-content active" id="wtab-goal">
+                        <div class="timeline">
+                            <div class="timeline-step completed">
+                                <div class="timeline-dot"></div>
+                                <div class="timeline-content">
+                                    <span class="timeline-title">Goal Met</span>
+                                    <span class="timeline-desc">Your corpus reaches the target</span>
+                                </div>
+                            </div>
+                            <div class="timeline-step">
+                                <div class="timeline-dot"></div>
+                                <div class="timeline-content">
+                                    <span class="timeline-title">7-Day Window</span>
+                                    <span class="timeline-desc">Confirm your withdrawal intent</span>
+                                </div>
+                            </div>
+                            <div class="timeline-step">
+                                <div class="timeline-dot"></div>
+                                <div class="timeline-content">
+                                    <span class="timeline-title">KYC Verification</span>
+                                    <span class="timeline-desc">Aadhaar-based e-KYC (one-time)</span>
+                                </div>
+                            </div>
+                            <div class="timeline-step">
+                                <div class="timeline-dot"></div>
+                                <div class="timeline-content">
+                                    <span class="timeline-title">Transfer via IMPS</span>
+                                    <span class="timeline-desc">Funds transferred to your bank</span>
+                                </div>
+                            </div>
+                            <div class="timeline-step">
+                                <div class="timeline-dot"></div>
+                                <div class="timeline-content">
+                                    <span class="timeline-title">🏆 Future You Badge</span>
+                                    <span class="timeline-desc">You did it! Badge permanently earned</span>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="penalty-note success-note">✨ 0 penalties — all XP, badges & streaks kept</p>
+                    </div>
+
+                    <!-- Emergency Tab -->
+                    <div class="wtab-content" id="wtab-emergency">
+                        <p class="emergency-note">Upload proof for emergency withdrawal (2 lifetime max)</p>
+                        <span class="emergency-used" id="emergency-used">Used: 0 / 2</span>
+
+                        <div class="form-group">
+                            <label class="input-label">Document Type</label>
+                            <select class="form-select" id="emergency-doc-type">
+                                <option value="">Select document type...</option>
+                                <option value="termination">Termination Letter</option>
+                                <option value="medical">Medical Certificate</option>
+                                <option value="epfo">EPFO Receipt</option>
+                                <option value="legal">Legal Notice</option>
+                                <option value="salary">Salary Slip</option>
+                                <option value="esic">ESIC Letter</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="input-label">Upload Document</label>
+                            <div class="file-upload" id="file-upload-area">
+                                <span class="upload-icon">📎</span>
+                                <span class="upload-text">Tap to upload or drag file here</span>
+                                <input type="file" id="emergency-file" accept=".pdf,.jpg,.png" onchange="handleFileUpload(this)">
+                            </div>
+                            <span class="file-name" id="uploaded-file-name"></span>
+                        </div>
+
+                        <button class="btn-primary btn-warning" onclick="submitEmergencyClaim()">
+                            Submit Emergency Claim
+                        </button>
+
+                        <div class="status-tracker" id="emergency-tracker" style="display:none;">
+                            <div class="tracker-step active" id="track-submitted">
+                                <div class="tracker-dot"></div>
+                                <span>Submitted</span>
+                            </div>
+                            <div class="tracker-line"></div>
+                            <div class="tracker-step" id="track-screening">
+                                <div class="tracker-dot"></div>
+                                <span>AI Screening</span>
+                            </div>
+                            <div class="tracker-line"></div>
+                            <div class="tracker-step" id="track-approved">
+                                <div class="tracker-dot"></div>
+                                <span>Approved</span>
+                            </div>
+                            <div class="tracker-line"></div>
+                            <div class="tracker-step" id="track-transfer">
+                                <div class="tracker-dot"></div>
+                                <span>Transfer</span>
+                            </div>
+                            <div class="tracker-line"></div>
+                            <div class="tracker-step" id="track-done">
+                                <div class="tracker-dot"></div>
+                                <span>Done</span>
+                            </div>
+                        </div>
+
+                        <p class="penalty-note warning-note">⚠️ Streak resets, XP −30%, badges kept, Comeback badge on restart</p>
+                    </div>
+
+                    <!-- Early Tab -->
+                    <div class="wtab-content" id="wtab-early">
+                        <div class="penalty-summary glass-card">
+                            <h3 class="penalty-title">⚠️ Early Withdrawal Penalties</h3>
+                            <ul class="penalty-list">
+                                <li><span class="penalty-icon">🔥</span> Streak resets to 0</li>
+                                <li><span class="penalty-icon">📉</span> XP reduced by 50%</li>
+                                <li><span class="penalty-icon">🪙</span> 200 coins deducted</li>
+                                <li><span class="penalty-icon">🏅</span> Badges kept</li>
+                            </ul>
+                        </div>
+
+                        <div class="partial-toggle glass-card">
+                            <div class="partial-info">
+                                <span class="partial-title">Partial Withdrawal</span>
+                                <span class="partial-desc">Withdraw 50% only, keep rest growing. Streak continues!</span>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="partial-toggle" onchange="togglePartial()">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+
+                        <button class="btn-primary btn-danger" onclick="confirmEarlyWithdrawal()">
+                            Confirm Early Withdrawal
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== SCREEN 4: QUESTS ==================== -->
+        <section id="screen-quests" class="screen">
+            <div class="quests-wrapper">
+                <div class="quests-header">
+                    <h2 class="section-title">⚔️ Weekly Quests</h2>
+                    <span class="quest-week" id="quest-week">Week 13</span>
+                </div>
+
+                <!-- Quest Chain 1 -->
+                <div class="quest-chain glass-card">
+                    <div class="chain-header">
+                        <span class="chain-title">💰 Savings Sprint</span>
+                        <span class="chain-progress">0/3 Complete</span>
+                    </div>
+                    <div class="quest-card" id="quest-1">
+                        <div class="quest-info">
+                            <span class="quest-title">Save ₹500 this week</span>
+                            <span class="quest-desc">Any amount counts — just keep saving daily!</span>
+                        </div>
+                        <div class="quest-progress-wrap">
+                            <div class="quest-progress-bar">
+                                <div class="quest-progress-fill" style="width: 0%"></div>
+                            </div>
+                            <span class="quest-progress-text">₹0 / ₹500</span>
+                        </div>
+                        <span class="quest-reward">🟣 +150 XP</span>
+                    </div>
+                    <div class="quest-card" id="quest-2">
+                        <div class="quest-info">
+                            <span class="quest-title">Read 2 Hint Cards</span>
+                            <span class="quest-desc">Learn something new about saving</span>
+                        </div>
+                        <div class="quest-progress-wrap">
+                            <div class="quest-progress-bar">
+                                <div class="quest-progress-fill" style="width: 0%"></div>
+                            </div>
+                            <span class="quest-progress-text">0 / 2</span>
+                        </div>
+                        <span class="quest-reward">🟣 +50 XP</span>
+                    </div>
+                    <div class="quest-card" id="quest-3">
+                        <div class="quest-info">
+                            <span class="quest-title">Answer Weekly Quiz</span>
+                            <span class="quest-desc">Score 3/3 on this week's quiz</span>
+                        </div>
+                        <div class="quest-progress-wrap">
+                            <div class="quest-progress-bar">
+                                <div class="quest-progress-fill" style="width: 0%"></div>
+                            </div>
+                            <span class="quest-progress-text">0 / 3</span>
+                        </div>
+                        <span class="quest-reward">🟣 +100 XP</span>
+                    </div>
+                    <div class="chain-reward locked" id="chain-reward-1">
+                        <span class="chain-reward-icon">🏅</span>
+                        <span class="chain-reward-text">Complete all 3 → Unlock <strong>Savings Sprint</strong> badge</span>
+                    </div>
+                </div>
+
+                <!-- Quest Chain 2 -->
+                <div class="quest-chain glass-card">
+                    <div class="chain-header">
+                        <span class="chain-title">🔥 Streak Master</span>
+                        <span class="chain-progress">0/3 Complete</span>
+                    </div>
+                    <div class="quest-card" id="quest-4">
+                        <div class="quest-info">
+                            <span class="quest-title">Maintain 7-day streak</span>
+                            <span class="quest-desc">Save every day for a full week</span>
+                        </div>
+                        <div class="quest-progress-wrap">
+                            <div class="quest-progress-bar">
+                                <div class="quest-progress-fill" style="width: 0%"></div>
+                            </div>
+                            <span class="quest-progress-text">0 / 7 days</span>
+                        </div>
+                        <span class="quest-reward">🟣 +200 XP</span>
+                    </div>
+                    <div class="quest-card" id="quest-5">
+                        <div class="quest-info">
+                            <span class="quest-title">Use Magic Round-Up 5 times</span>
+                            <span class="quest-desc">Let round-ups do the saving for you</span>
+                        </div>
+                        <div class="quest-progress-wrap">
+                            <div class="quest-progress-bar">
+                                <div class="quest-progress-fill" style="width: 0%"></div>
+                            </div>
+                            <span class="quest-progress-text">0 / 5</span>
+                        </div>
+                        <span class="quest-reward">🟣 +75 XP</span>
+                    </div>
+                    <div class="quest-card" id="quest-6">
+                        <div class="quest-info">
+                            <span class="quest-title">Earn 100 coins this week</span>
+                            <span class="quest-desc">Complete actions to stack coins</span>
+                        </div>
+                        <div class="quest-progress-wrap">
+                            <div class="quest-progress-bar">
+                                <div class="quest-progress-fill" style="width: 0%"></div>
+                            </div>
+                            <span class="quest-progress-text">0 / 100 coins</span>
+                        </div>
+                        <span class="quest-reward">🟣 +100 XP</span>
+                    </div>
+                    <div class="chain-reward locked" id="chain-reward-2">
+                        <span class="chain-reward-icon">🏅</span>
+                        <span class="chain-reward-text">Complete all 3 → Unlock <strong>Streak Master</strong> badge</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== SCREEN 5: HINTS ==================== -->
+        <section id="screen-hints" class="screen">
+            <div class="hints-wrapper">
+                <h2 class="section-title">💡 Hints & Learn</h2>
+
+                <!-- Weekly Quiz Card -->
+                <div class="quiz-card glass-card" id="quiz-card">
+                    <div class="quiz-header">
+                        <span class="quiz-icon">🧠</span>
+                        <div class="quiz-info">
+                            <span class="quiz-title">Weekly Quiz</span>
+                            <span class="quiz-sub">Answer 3 questions, earn 50 coins</span>
+                        </div>
+                        <span class="quiz-reward-badge">🪙 50</span>
+                    </div>
+                    <button class="btn-primary btn-small" onclick="startQuiz()">Take Quiz</button>
+                </div>
+
+                <!-- Hint Cards Feed -->
+                <div class="hints-feed" id="hints-feed">
+                    <!-- Hint cards will be populated by JS -->
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== SCREEN 6: PROFILE ==================== -->
+        <section id="screen-profile" class="screen">
+            <div class="profile-wrapper">
+                <!-- Profile Header -->
+                <div class="profile-header glass-card">
+                    <div class="profile-avatar-section">
+                        <div class="profile-avatar-ring">
+                            <div class="profile-avatar" id="profile-avatar">🧑‍🚀</div>
+                        </div>
+                        <div class="profile-level-badge" id="profile-level-badge">Lvl 1</div>
+                    </div>
+                    <h2 class="profile-name" id="profile-name">Adventurer</h2>
+                    <span class="profile-xp" id="profile-xp">120 XP total</span>
+                </div>
+
+                <!-- Savings Stats -->
+                <div class="profile-stats glass-card">
+                    <div class="profile-stat">
+                        <span class="profile-stat-value" id="p-stat-saved">₹0</span>
+                        <span class="profile-stat-label">Total Saved</span>
+                    </div>
+                    <div class="profile-stat">
+                        <span class="profile-stat-value" id="p-stat-streak">0 days</span>
+                        <span class="profile-stat-label">Longest Streak</span>
+                    </div>
+                    <div class="profile-stat">
+                        <span class="profile-stat-value" id="p-stat-emergency">0 / 2</span>
+                        <span class="profile-stat-label">Emergency Used</span>
+                    </div>
+                </div>
+
+                <!-- Badge Grid -->
+                <div class="badge-section">
+                    <h3 class="badge-section-title">🏅 Badges</h3>
+                    <div class="badge-grid" id="badge-grid">
+                        <!-- Badges populated by JS -->
+                    </div>
+                </div>
+
+                <!-- Savings Squad -->
+                <div class="squad-section glass-card">
+                    <h3 class="squad-title">👥 Savings Squad</h3>
+                    <p class="squad-desc">Your squad's streak status</p>
+                    <div class="squad-members" id="squad-members">
+                        <div class="squad-member">
+                            <span class="squad-name">Priya</span>
+                            <span class="squad-streak">🔥 12</span>
+                        </div>
+                        <div class="squad-member">
+                            <span class="squad-name">Arjun</span>
+                            <span class="squad-streak">🔥 7</span>
+                        </div>
+                        <div class="squad-member">
+                            <span class="squad-name">Neha</span>
+                            <span class="squad-streak">🔥 24</span>
+                        </div>
+                        <div class="squad-member">
+                            <span class="squad-name">Rahul</span>
+                            <span class="squad-streak">🔥 3</span>
+                        </div>
+                    </div>
+                    <button class="btn-secondary btn-small" onclick="inviteSquad()">Invite Friends (+200 coins)</button>
+                </div>
+
+                <!-- Coin Shop Preview -->
+                <div class="shop-preview glass-card">
+                    <h3 class="shop-title">🛒 Coin Shop</h3>
+                    <div class="shop-items" id="shop-items">
+                        <div class="shop-item" onclick="purchaseItem('streak-shield')">
+                            <span class="shop-item-icon">🛡️</span>
+                            <span class="shop-item-name">Streak Shield</span>
+                            <span class="shop-item-price">🪙 100</span>
+                        </div>
+                        <div class="shop-item" onclick="purchaseItem('dragon-skin')">
+                            <span class="shop-item-icon">🐉</span>
+                            <span class="shop-item-name">Dragon Skin</span>
+                            <span class="shop-item-price">🪙 300</span>
+                        </div>
+                        <div class="shop-item" onclick="purchaseItem('space-frame')">
+                            <span class="shop-item-icon">🚀</span>
+                            <span class="shop-item-name">Space Frame</span>
+                            <span class="shop-item-price">🪙 250</span>
+                        </div>
+                        <div class="shop-item" onclick="purchaseItem('ninja-outfit')">
+                            <span class="shop-item-icon">🥷</span>
+                            <span class="shop-item-name">Ninja Outfit</span>
+                            <span class="shop-item-price">🪙 200</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== MODALS ==================== -->
+
+        <!-- Save Modal -->
+        <div class="modal-overlay" id="save-modal" onclick="closeSaveModal(event)">
+            <div class="modal glass-card" onclick="event.stopPropagation()">
+                <div class="modal-header">
+                    <h3>Add to Vault</h3>
+                    <button class="modal-close" onclick="closeSaveModal()">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="save-presets">
+                        <button class="preset-btn" onclick="setSaveAmount(50, this)">₹50</button>
+                        <button class="preset-btn active" onclick="setSaveAmount(100, this)">₹100</button>
+                        <button class="preset-btn" onclick="setSaveAmount(500, this)">₹500</button>
+                        <button class="preset-btn" onclick="setSaveAmount(1000, this)">₹1000</button>
+                    </div>
+                    <div class="save-custom">
+                        <label class="input-label">Custom Amount</label>
+                        <input type="number" id="save-amount-input" class="form-input" value="100" min="1">
+                    </div>
+                    <div class="save-method">
+                        <button class="method-btn active" onclick="setPayMethod('upi', this)">
+                            <span>📱</span> UPI
+                        </button>
+                        <button class="method-btn" onclick="setPayMethod('netbanking', this)">
+                            <span>🏦</span> Net Banking
+                        </button>
+                    </div>
+                    <button class="btn-primary" onclick="processSave()">
+                        <span class="btn-icon">✨</span>
+                        Save Now
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quiz Modal -->
+        <div class="modal-overlay" id="quiz-modal" onclick="closeQuizModal(event)">
+            <div class="modal glass-card modal-lg" onclick="event.stopPropagation()">
+                <div class="modal-header">
+                    <h3>🧠 Weekly Quiz</h3>
+                    <button class="modal-close" onclick="closeQuizModal()">&times;</button>
+                </div>
+                <div class="modal-body" id="quiz-body">
+                    <!-- Quiz content populated by JS -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Vault Rules Modal -->
+        <div class="modal-overlay" id="rules-modal" onclick="closeRulesModal(event)">
+            <div class="modal glass-card modal-lg" onclick="event.stopPropagation()">
+                <div class="modal-header">
+                    <h3>📜 Vault Rules</h3>
+                    <button class="modal-close" onclick="closeRulesModal()">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="rules-list">
+                        <div class="rule-item">
+                            <span class="rule-icon">🏦</span>
+                            <div class="rule-text">
+                                <strong>Where does my money go?</strong>
+                                <p>Your savings are invested in SEBI-regulated Liquid Mutual Funds or RBI-regulated Recurring Deposits — safe, compliant, and earning ~8% p.a.</p>
+                            </div>
+                        </div>
+                        <div class="rule-item">
+                            <span class="rule-icon">🔒</span>
+                            <div class="rule-text">
+                                <strong>No demat account needed</strong>
+                                <p>We handle everything. Just save via UPI or net banking. No stock market, no trading — just simple, smart savings.</p>
+                            </div>
+                        </div>
+                        <div class="rule-item">
+                            <span class="rule-icon">✅</span>
+                            <div class="rule-text">
+                                <strong>Goal-complete withdrawal</strong>
+                                <p>0 penalty. All XP, badges, and streaks kept. Transfer via IMPS after KYC.</p>
+                            </div>
+                        </div>
+                        <div class="rule-item">
+                            <span class="rule-icon">🆘</span>
+                            <div class="rule-text">
+                                <strong>Emergency withdrawal (2 lifetime max)</strong>
+                                <p>Upload proof document. AI reviews in &lt;10 min for clear cases. Streak resets, XP −30%.</p>
+                            </div>
+                        </div>
+                        <div class="rule-item">
+                            <span class="rule-icon">⚠️</span>
+                            <div class="rule-text">
+                                <strong>Early withdrawal</strong>
+                                <p>Streak resets, XP −50%, 200 coins deducted. Badges kept.</p>
+                            </div>
+                        </div>
+                        <div class="rule-item">
+                            <span class="rule-icon">➗</span>
+                            <div class="rule-text">
+                                <strong>Partial withdrawal</strong>
+                                <p>Take up to 50%, rest stays growing. Streak continues!</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Toast Notifications -->
+        <div class="toast-container" id="toast-container"></div>
+
+        <!-- Success Animation Overlay -->
+        <div class="success-overlay" id="success-overlay">
+            <div class="success-content">
+                <div class="success-icon" id="success-icon">🎉</div>
+                <h2 class="success-title" id="success-title">Saved!</h2>
+                <p class="success-desc" id="success-desc">₹100 added to your vault</p>
+                <div class="success-rewards" id="success-rewards"></div>
+            </div>
+        </div>
+
+        <!-- ==================== BOTTOM NAV ==================== -->
+        <nav class="bottom-nav" id="bottom-nav">
+            <button class="nav-item active" onclick="navigateTo('home')" id="nav-home">
+                <span class="nav-icon">🏠</span>
+                <span class="nav-label">Home</span>
+            </button>
+            <button class="nav-item" onclick="navigateTo('vault')" id="nav-vault">
+                <span class="nav-icon">🔐</span>
+                <span class="nav-label">Vault</span>
+            </button>
+            <button class="nav-item" onclick="navigateTo('quests')" id="nav-quests">
+                <span class="nav-icon">⚔️</span>
+                <span class="nav-label">Quests</span>
+            </button>
+            <button class="nav-item" onclick="navigateTo('hints')" id="nav-hints">
+                <span class="nav-icon">💡</span>
+                <span class="nav-label">Hints</span>
+            </button>
+            <button class="nav-item" onclick="navigateTo('profile')" id="nav-profile">
+                <span class="nav-icon">👤</span>
+                <span class="nav-label">Profile</span>
+            </button>
+        </nav>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
