@@ -1,6 +1,7 @@
 node_modules/
 retirequest/client/node_modules/
-retirequest/server/node_modules/
+retirequest/client/api/node_modules/
+retirequest/node_modules/
 retirequest/client/android/
 retirequest/client/ios/
 retirequest/client/dist/

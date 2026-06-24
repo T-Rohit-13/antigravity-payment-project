@@ -1,0 +1,16 @@
+{
+  "name": "retirequest",
+  "version": "1.0.0",
+  "description": "RetireQuest is a full-stack, gamified retirement savings platform designed for Gen Z in India. It empowers users to start their retirement journey early through streaks, quests, hints, and automated round-up/cashback saves.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "pg": "^8.22.0"
+  }
+}
